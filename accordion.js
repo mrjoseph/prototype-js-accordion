@@ -1,22 +1,17 @@
 
-  	var sa_Customer_Service_accordion = sa_Customer_Service_accordion || {};
-  	sa_Customer_Service_accordion = {
-      addArrows : function(){
-        $$('ul#cs-accordion li').each(function (elem){
-        });
-      },
-
+  	var prototypeAccordion = prototypeAccordion || {};
+  	prototypeAccordion = {
   		//Slide Toggle Effect
-  		slideToggle : function(elem){
+  		slideToggle : function(elem,speed){
   			Effect.toggle( elem, 'slide', {
-  			    duration: 0.5,
+  			    duration: speed,
   			    beforeStart: function() {
   			        $$('div.show').each( function (el) {
   			            el.removeClassName( 'show' );
                     var arrow = el.up().down('h4').down('span');
                     arrow.removeClassName( 'opened' );
                     arrow.addClassName( 'closed' );
-  			            Effect.SlideUp(el, { duration: 0.5 } );
+  			            Effect.SlideUp(el, { duration: speed } );
   			        });
   			    },
   			    afterFinish: function() {
@@ -32,42 +27,45 @@
   		},
 
       //Slide down the first slider
-      openThisFirst : function(num){
+      openThisFirst : function(accordion,speed,delay,first){
+         console.log(first);
         var 
-        accordionLi = document.getElementById('cs-accordion').getElementsByTagName("li"),
+        accordionLi = document.getElementById(accordion).getElementsByTagName("li"),
         i, 
         result = [],
         firstOpen;
         for(i=0;i<accordionLi.length;i++){
         result.push(accordionLi[i]);  
         }
-        firstOpen = result[num].down('div');
+        firstOpen = result[first].down('div');
         setTimeout(function(){
-          sa_Customer_Service_accordion.slideToggle(firstOpen); 
-        },2000);
+          prototypeAccordion.slideToggle(firstOpen,speed); 
+        },delay);
       },
 
-  		init : function(){
-        //sa_Customer_Service_accordion.addArrows();
+  		init : function(accordion,speed,delay,first){
+        //prototypeAccordion.addArrows();
   			//This function adds ids to the containers and adds inline css display none.
   			var i = 0;
-  			$$('#cs-accordion li').each( function (link) {
+  			$$('#'+ accordion +' li').each( function (link) {
   				var container = link.down('div');
   				if(!container.hasAttribute('id')){
   					container.writeAttribute('id','temp'+ i);
   				}		
-  				container.writeAttribute('style','display:none');
   				i++;
   			});
 
 			//Slide down the first slider
-      sa_Customer_Service_accordion.openThisFirst(0);
-
-			$$('#cs-accordion li').each( function (link) {
+     
+      if(typeof first == "number"){
+        prototypeAccordion.openThisFirst(accordion,speed,delay,first);
+      }
+      
+			$$('#'+ accordion +' li').each( function (link) {
 				var container = link.up().down('div');
 	             link.observe('click', function(event) {
 	                content = event.element().up().down('div.container');
-	                sa_Customer_Service_accordion.slideToggle(content);
+	                prototypeAccordion.slideToggle(content,speed);
 	            });
 	        });
   		}
@@ -75,12 +73,24 @@
 
 	document.observe("dom:loaded", function() {
 		
-		//Only run if the carousel exsists 
-		if($$('#cs-accordion').length > 0){
-			sa_Customer_Service_accordion.init();
-		} else {
-			console.log('accordion does not exsist');
-		}
+var LoadAccordion = function(accordion,speed,delay,first){
+  if($$('#'+accordion ).length > 0){
+    prototypeAccordion.init(accordion,speed,delay,first);
+  } else {
+    console.log('accordion does not exsist');
+  }
+};
+/*
+  @description:
+  To use accordion more than once create another instance of the LoadAccordion()
+  @peram:
+  1. Dom element
+  2. sopeed
+  3. delay before first slide
+  4. container to slide open. If removed will not slide open any containers
+
+*/
+  LoadAccordion('accordion',.3,500,2);
 	});
  
   
